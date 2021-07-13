@@ -24,10 +24,20 @@ function ProfileSideBar(props){
 export default function Home() {
   const [communities, setCommunities] = useState([]);
   const githubUser = 'donrenato';
-  const favoritos = ['omariosouto', 'juunegreiros', 'peas', 'diego3g', 'marcobrunodev']
+  const favoritos = [
+    'omariosouto', 
+    'juunegreiros', 
+    'peas', 
+    'diego3g', 
+    'marcobrunodev',
+    'rayra-firmino',
+    'rafaballerini', 
+    'felipefialho',
+
+  ]
   return (
     <>
-      <AlurakutMenu />
+      <AlurakutMenu githubUser={githubUser} />
       <MainGrid>
         <div className="profileArea"style={{gridArea: 'profileArea'}}>
           <ProfileSideBar githubUser={githubUser}/>
@@ -83,15 +93,17 @@ export default function Home() {
             Pessoas da comunidade ({favoritos.length})
             </h2>
             <ul>
-            {favoritos.map(favorito => (
+            {favoritos.slice(0,6).map(favorito => (
               <li key={favorito}>
-                 <a href={`/users/${favorito}`} key={favorito}>
+                 <a href={`https://github.com/${favorito}`} key={favorito}>
                   <img src={`https://github.com/${favorito}.png`}  />
                   <span>{favorito}</span>
                 </a>
               </li>
             ))}
             </ul>
+            <hr />
+            <a className="seemAll" href="" >Ver todos</a>
           </ProfileRelationsBoxWrapper >
        
           <ProfileRelationsBoxWrapper>
@@ -99,7 +111,7 @@ export default function Home() {
             Comunidades ({communities.length})
             </h2>
             <ul>
-            {communities.map(community => (
+            {communities.slice(0,6).map(community => (
               <li>
                  <a href={`${community.title}`} key={community.id}>
                   <img src={`${community.image}`}  />
@@ -108,6 +120,8 @@ export default function Home() {
               </li>
             ))}
             </ul>
+            <hr />
+            <a className="seemAll" href="" >Ver todos</a>
           </ProfileRelationsBoxWrapper >
         </div>
       </MainGrid>
