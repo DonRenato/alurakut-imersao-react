@@ -54,6 +54,16 @@ const Box = styled.div`
     border-radius: 10000px;
     background-color: #6F92BB;
   }
+
+  .seemAll {
+    color: #2E7BB4;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  hr {
+    margin-top: 12px;
+    margin-bottom: 8px;
 `;
 
 export default Box;
