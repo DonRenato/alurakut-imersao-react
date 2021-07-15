@@ -64,6 +64,7 @@ const Box = styled.div`
   hr {
     margin-top: 12px;
     margin-bottom: 8px;
+  }
 `;
 
 export default Box;
