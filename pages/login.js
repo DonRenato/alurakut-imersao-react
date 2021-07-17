@@ -5,6 +5,7 @@ import nookies from 'nookies'
 export default function LoginScreen() {
   const router = useRouter();
   const [githubUser, setGithubUser] = useState('')
+  const [erroLogin, setErroLogin] = useState(false);
     return (
         <main style={{ display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center' }}>
             <div className="loginScreen">
@@ -17,26 +18,34 @@ export default function LoginScreen() {
                 </section>
 
                 <section className="formArea">
-                    <form className="box" onSubmit={(e)=>{
-                          e.preventDefault();
-                          fetch('https://alurakut.vercel.app/api/login', {
-                            method: 'POST',
-                            headers: {
-                              'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({githubUser: githubUser })
-                          })
-                            .then(async res =>{
-                              const data = await res.json();
-                              const token = data.token;
-                              nookies.set(null, 'USER_TOKEN', token, {
+                    <form className="box" onSubmit={async (e) => {
+                            e.preventDefault();
+
+                            try {
+                            const validUserRes = await fetch(`https://api.github.com/users/${githubUser}`)
+                            if (!validUserRes.ok) {
+                                throw new Error('Não foi possível pegar os dados :(');
+                            }
+
+                            const token = await fetch('https://alurakut.vercel.app/api/login', {
+                                method: 'POST',
+                                headers: {
+                                'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({ githubUser: githubUser })
+                            });
+                            const res = await token.json();
+                            nookies.set(null, 'USER_TOKEN', res.token, {
                                 path: '/',
                                 maxAge: 86400 * 7
-                              } )
-                              router.push('/')
                             })
+                            router.push('/')
+                            } catch (error) {
+                            setErroLogin(true);
+                            }
+                        }
                           
-                        }}>
+                        }>
                         <p>
                             Acesse agora mesmo com seu usuário do <strong>GitHub</strong>!
                         </p>
@@ -45,10 +54,19 @@ export default function LoginScreen() {
                             value = {githubUser}
                             onChange = {(e)=>{
                               setGithubUser(e.target.value)
+                              if (e.target.value.length === 0) {
+                                setErroLogin(false)
+                              }
                             }}
-                        />
-                        {  githubUser.length === 0 ? 'Digite o user' : ''}
-                        <button type="submit" >
+                          />
+                         
+                          {erroLogin && githubUser.length > 0
+                            ? <p style={{ color: 'red' }}>Erro ao logar, usuário inválido</p>
+                            : ''}
+                            
+                        
+                    
+                        <button type="submit" disabled={!githubUser} >
                             Login
                         </button>
                     </form>
