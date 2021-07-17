@@ -1,4 +1,6 @@
 import MainGrid from "../src/components/MainGrid"
+import nookies from 'nookies'
+import jwt from 'jsonwebtoken'
 import Box from "../src/components/Box"
 import { ProfileRelationsBoxWrapper } from "../src/components/ProfileRelations"
 import { AlurakutMenu, AlurakutProfileSidebarMenuDefault, OrkutNostalgicIconSet } from "../src/lib/AluraKutCommons"
@@ -43,16 +45,16 @@ function ProfileRelationsBox(props){
   )
 }
 
-export default function Home() {
+export default function Home(props) {
   const [communities, setCommunities] = useState([]);
   const [followers, setFollowers] = useState([]);
   const [favorites, setFavorites] = useState([]);
-  const githubUser = 'donrenato';
+  const githubUser = props.githubUser;
   
   
 
   useEffect(()=>(
-    fetch('https://api.github.com/users/donrenato/following')
+    fetch(`https://api.github.com/users/${props.githubUser}/following`)
     .then(async res =>{
       const resp = await res.json();
       setFavorites(resp);
@@ -61,7 +63,7 @@ export default function Home() {
   ), [])
 
   useEffect(()=>(
-    fetch('https://api.github.com/users/donrenato/followers')
+    fetch(`https://api.github.com/users/${props.githubUser}/followers`)
     .then(async res =>{
        const resp = await res.json();
        setFollowers(resp);
@@ -133,7 +135,6 @@ export default function Home() {
                .then( async (res) =>{
                   const data  = await res.json();
                   const community = data.record;
-                  console.log(community)
                   const updatedCommunities = [...communities, community]
                   setCommunities(updatedCommunities);
                 })
@@ -189,4 +190,31 @@ export default function Home() {
       </MainGrid>
     </>
   )
+}
+
+export  async function getServerSideProps(context){
+  const  cookies = nookies.get(context)
+  const token = cookies.USER_TOKEN
+ 
+  const { isAuthenticated } = await fetch('https://alurakut.vercel.app/api/auth', {
+        headers: {
+            Authorization: token
+        }
+    }) .then((resposta) => resposta.json())
+ 
+  if(!isAuthenticated){
+    return{
+        redirect: {
+            destination: '/login',
+            permanent: false
+        }
+    }
+}
+const  { githubUser }  = jwt.decode(token)
+  return{
+    props:{
+      githubUser
+      
+    }
+  }
 }
